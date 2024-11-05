@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+        
+        .card {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            background-color: #212529;
+            color: white;
+            padding: 1rem;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .btn-dark {
+            background-color: #212529;
+            border-color: #212529;
+        }
+        
+        .btn-outline-dark {
+            color: #212529;
+            border-color: #212529;
+        }
+        
+        .error {
+            color: #dc3545;
+            padding: 0.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        .edit-form {
+            display: none;
+            background-color: #f8f9fa;
+            padding: 1rem;
+        }
+        
+        .edit-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="h3 mb-0">Student Management System</h1>
+            </div>
+            
+            <div class="card-body">
+                <% if (error) { %>
+                    <div class="alert alert-danger"><%= error %></div>
+                <% } %>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="h5 mb-0">Add New Student</h2>
+                    </div>
+                    <div class="card-body">
+                        <form action="/students" method="POST">
+                            <div class="row">
+                                <div class="col-md-4 form-group">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" name="name" class="form-control" required>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <label class="form-label">Age</label>
+                                    <input type="number" name="age" class="form-control" required>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <label class="form-label">Grade</label>
+                                    <input type="text" name="grade" class="form-control" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-dark mt-3">Add Student</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="h5 mb-0">Students List</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Age</th>
+                                    <th>Grade</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% students.forEach(function(student) { %>
+                                    <tr>
+                                        <td><%= student.id %></td>
+                                        <td><%= student.name %></td>
+                                        <td><%= student.age %></td>
+                                        <td><%= student.grade %></td>
+                                        <td class="action-buttons">
+                                            <button class="btn btn-sm btn-outline-dark" 
+                                                    onclick="showEditForm('<%= student.id %>', '<%= student.name %>', '<%= student.age %>', '<%= student.grade %>')">
+                                                Edit
+                                            </button>
+                                            <form action="/students/<%= student.id %>/delete" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr class="edit-form" id="edit-form-<%= student.id %>">
+                                        <td colspan="5">
+                                            <form action="/students/<%= student.id %>/update" method="POST">
+                                                <div class="row">
+                                                    <div class="col-md-4 form-group">
+                                                        <label class="form-label">Name</label>
+                                                        <input type="text" name="name" value="<%= student.name %>" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-4 form-group">
+                                                        <label class="form-label">Age</label>
+                                                        <input type="number" name="age" value="<%= student.age %>" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-4 form-group">
+                                                        <label class="form-label">Grade</label>
+                                                        <input type="text" name="grade" value="<%= student.grade %>" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3">
+                                                    <button type="submit" class="btn btn-dark">Update Student</button>
+                                                    <button type="button" class="btn btn-outline-secondary ms-2" 
+                                                            onclick="hideEditForm('<%= student.id %>')">Cancel</button>
+                                                </div>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showEditForm(id, name, age, grade) {
+            document.querySelectorAll('.edit-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            
+            const form = document.getElementById(`edit-form-${id}`);
+            form.classList.add('active');
+        }
+
+        function hideEditForm(id) {
+            const form = document.getElementById(`edit-form-${id}`);
+            form.classList.remove('active');
+        }
+    </script>
+</body>
+</html>

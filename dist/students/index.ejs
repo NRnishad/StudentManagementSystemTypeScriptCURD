@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Management System</title>
+    <style>
+        .error { color: red; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        form { margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>Student Management System</h1>
+    
+    <% if (error) { %>
+        <div class="error"><%= error %></div>
+    <% } %>
+
+    <h2>Add New Student</h2>
+    <form action="/students" method="POST">
+        <div>
+            <label>Name: <input type="text" name="name" required></label>
+        </div>
+        <div>
+            <label>Age: <input type="number" name="age" required></label>
+        </div>
+        <div>
+            <label>Grade: <input type="text" name="grade" required></label>
+        </div>
+        <button type="submit">Add Student</button>
+    </form>
+
+    <h2>Students List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Grade</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% students.forEach(function(student) { %>
+                <tr>
+                    <td><%= student.id %></td>
+                    <td><%= student.name %></td>
+                    <td><%= student.age %></td>
+                    <td><%= student.grade %></td>
+                    <td>
+                        <form action="/students/<%= student.id %>/delete" method="POST" style="display: inline;">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</body>
+</html>
